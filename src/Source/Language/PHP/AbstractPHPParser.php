@@ -7081,6 +7081,11 @@ abstract class AbstractPHPParser
                     $this->consumeToken(Tokens::T_DOC_COMMENT)->image,
                 );
 
+            case Tokens::T_ATTRIBUTE:
+                return $this->builder->buildAstAttribute(
+                    $this->consumeToken(Tokens::T_ATTRIBUTE)->image,
+                );
+
             case Tokens::T_CURLY_BRACE_OPEN:
                 return $this->parseRegularScope();
 

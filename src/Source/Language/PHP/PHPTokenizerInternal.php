@@ -833,36 +833,12 @@ class PHPTokenizerInternal implements FullTokenizer
     private function substituteTokens(array $tokens): array
     {
         $result = [];
-        $attributeComment = null;
-        $attributeCommentLine = null;
-        $brackets = 0;
 
         foreach ($tokens as $index => $token) {
             $temp = (array) $token;
             $temp = $temp[0];
 
-            if ($attributeComment) {
-                if ($temp === '[') {
-                    $brackets++;
-                }
-
-                if ($temp === ']') {
-                    $brackets--;
-                }
-
-                if ($brackets <= 0) {
-                    $result[] = [T_COMMENT, "$attributeComment */", (string) $attributeCommentLine];
-                    $attributeComment = null;
-
-                    continue;
-                }
-
-                $attributeComment .= is_array($token) ? $token[1] : $token;
-            } elseif ($temp === T_ATTRIBUTE) {
-                $attributeComment = '/* @';
-                $attributeCommentLine = $token[2];
-                $brackets = 1;
-            } elseif (is_array($token) && ($temp === T_NAME_QUALIFIED || $temp === T_NAME_FULLY_QUALIFIED)) {
+            if (is_array($token) && ($temp === T_NAME_QUALIFIED || $temp === T_NAME_FULLY_QUALIFIED)) {
                 foreach ($this->splitQualifiedNameToken($token) as $subToken) {
                     $result[] = $subToken;
                 }

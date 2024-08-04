@@ -562,6 +562,9 @@ interface Tokens
     /** Marks an enum token. */
     public const T_ENUM = 372;
 
+    /** Marks an attribute token. */
+    public const T_ATTRIBUTE = 387;
+
     /** Marks any content not between php tags. */
     public const T_NO_PHP = 255;
 }
