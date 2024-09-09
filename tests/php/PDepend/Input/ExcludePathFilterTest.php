@@ -60,6 +60,88 @@ use SplFileInfo;
 class ExcludePathFilterTest extends AbstractTestCase
 {
     /**
+     * testPatternsWithSixtyThousandCharactersAcceptsRelativePatternNotInList
+     *
+     * This is to test that the default preg_match limit of 32,766 characters is avoided with large patterns in
+     * circumstances where too many files are excluded instead of using the baseline.
+     *
+     * Generates 2,000 patterns of 20, 10 and 5 random alpha characters, with some slashes (about 70k characters))
+     *
+     * @return void
+     */
+    public function testPatternsWithSixtyThousandCharactersAcceptsRelativeOrAbsolutePatternNotInList()
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        $this->assertTrue($filter->accept('foo0/baz0/bar0', 'C:\\blahblah\\bar'));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList
+     *
+     * @return void
+     */
+    public function testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList()
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        $firstPattern = str_replace('/', '\\', $patterns[0]);
+        $relativePath = 'foo\\'.$firstPattern;
+
+        $this->assertFalse($filter->accept($relativePath, 'C:\\blahblah\\bar'));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList
+     *
+     * @return void
+     */
+    public function testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList()
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        $firstPattern = str_replace('/', '\\', $patterns[0]);
+        $absolutePath = $firstPattern.'\\bar';
+
+        $this->assertFalse($filter->accept('/foobar/barf00', $absolutePath));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue()
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+
+        $isBulk = new \ReflectionProperty($filter, 'isBulk');
+
+        $this->assertTrue($isBulk->getValue($filter));
+    }
+
+    /**
+     * testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse
+     *
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse()
+    {
+        $filter = new ExcludePathFilter(array('Just16Characters'));
+
+        $isBulk = new \ReflectionProperty($filter, 'isBulk');
+
+        $this->assertFalse($isBulk->getValue($filter));
+    }
+
+    /**
      * testAbsoluteUnixPathAsFilterPatternMatches
      */
     public function testAbsoluteUnixPathAsFilterPatternMatches(): void
@@ -218,5 +300,38 @@ class ExcludePathFilterTest extends AbstractTestCase
         sort($actual);
 
         return $actual;
+    }
+
+    /**
+     * Returns a random string with a given length.
+     *
+     * @param integer $length The length of the random string.
+     *
+     * @return string
+     */
+    protected function randAlpha($length = 3)
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $charsLength = strlen($chars);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $chars[mt_rand(0, $charsLength - 1)];
+        }
+        return $randomString;
+    }
+
+    /**
+     * Prepares a list of test patterns which loosely resemble a directory/path, e.g. abcd/efg/hijk
+     *
+     * @return array<string>
+     */
+    protected function prepareTestPatterns()
+    {
+        $patterns = array();
+        for ($i = 0; $i < 2000; $i++) {
+            $patterns[] = $this->randAlpha(20) . '/' . $this->randAlpha(10).'/'.$this->randAlpha(5);
+        }
+
+        return $patterns;
     }
 }
