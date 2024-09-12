@@ -13,13 +13,13 @@ checks:
         duplication: true
 
 filter:
-    paths: [ "src/main/php/*" ]
+    paths: [ "src/*" ]
 
 tools:
     external_code_coverage: true
     php_mess_detector:
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     php_analyzer:
         config:
             parameter_reference_check: { enabled: false }
@@ -43,22 +43,22 @@ tools:
             use_statement_fixes: { enabled: true, remove_unused: true, preserve_multiple: false, order_alphabetically: false }
             metrics_lack_of_cohesion_methods: { enabled: true }
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     php_code_sniffer:
         config:
             standard: PSR2
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     sensiolabs_security_checker:
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     php_code_coverage:
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     php_cpd: false
     php_loc:
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']
     php_pdepend:
         filter:
-            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'src/main/resources/*', 'src/test/resources/*']
+            excluded_paths: ['vendor/*', 'app/*', 'web/*', 'resources/*', 'tests/resources/*']

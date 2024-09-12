@@ -87,8 +87,8 @@ class ApplicationTest extends AbstractTestCase
     {
         $cwd = getcwd();
         static::assertNotFalse($cwd);
-        chdir(__DIR__ . '/../../../..');
-        $bin = realpath(__DIR__ . '/../../../../src/bin/pdepend.php');
+        chdir(__DIR__ . '/../../..');
+        $bin = realpath(__DIR__ . '/../../../bin/pdepend.php');
         $output = shell_exec('echo "<?php class FooBar {}" | php ' . $bin . ' --summary-xml=foo.xml -');
         static::assertNotNull($output);
         static::assertNotFalse($output);

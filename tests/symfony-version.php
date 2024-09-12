@@ -7,7 +7,7 @@
  * run for a given commit.
  */
 
-$installed = require __DIR__.'/../../vendor/composer/installed.php';
+$installed = require __DIR__.'/../vendor/composer/installed.php';
 $versions = $installed['versions'];
 
 $symfonyPackages = array(

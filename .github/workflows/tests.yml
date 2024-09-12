@@ -54,7 +54,7 @@ jobs:
         run: composer update --prefer-dist --no-progress --prefer-${{ matrix.setup }} --ignore-platform-req=php
 
       - name: Check Symfony version
-        run: php src/test/symfony-version.php
+        run: php tests/symfony-version.php
 
       - name: Run test suite
         run: composer test

@@ -158,7 +158,7 @@ if (false === isset($argv[2])) {
     exit(0);
 }
 
-$parserFile = sprintf(__DIR__ . '/../src/main/php/PDepend/Source/Language/PHP/PHPParserVersion%s.php', $argv[2]);
+$parserFile = sprintf(__DIR__ . '/../src/Source/Language/PHP/PHPParserVersion%s.php', $argv[2]);
 if (!file_exists($parserFile) || !($parserCode = file_get_contents($parserFile))) {
     fwrite(STDERR, "The given parser version does not exist.\n");
 

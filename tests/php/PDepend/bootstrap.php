@@ -55,7 +55,7 @@ spl_autoload_register(function ($class): void {
     }
 });
 
-require_once __DIR__ . '/../../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 if (class_exists('PHP_Token')) {
     require_once __DIR__ . '/load-coverage-tokens.php';

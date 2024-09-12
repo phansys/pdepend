@@ -7,7 +7,6 @@ PHP_Depend-*.tgz
 .build
 .pear
 vendor
-src/test/vendor
 composer.phar
 composer.lock
 dist
@@ -16,3 +15,4 @@ dist
 coverage.xml
 coverage
 .php-cs-fixer.cache
+/.phpunit.result.cache

@@ -81,7 +81,7 @@ class CacheVersionUpdater
      */
     public function __construct()
     {
-        $root = realpath(__DIR__ . '/../src/main/php/PDepend');
+        $root = realpath(__DIR__ . '/../src');
         if (!$root) {
             throw new Exception('Unable find application root');
         }

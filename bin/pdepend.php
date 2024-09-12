@@ -48,7 +48,7 @@ if (str_starts_with('@php_bin@', '@php_bin')) {
     set_include_path('.' . PATH_SEPARATOR . __DIR__ . '/../main/php');
 }
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Allow as much memory as possible by default
 ini_set('memory_limit', -1);

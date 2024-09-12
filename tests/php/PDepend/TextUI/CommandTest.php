@@ -73,7 +73,7 @@ class CommandTest extends AbstractTestCase
     {
         parent::setUp();
 
-        $data = @parse_ini_file(__DIR__ . '/../../../../../build.properties');
+        $data = @parse_ini_file(__DIR__ . '/../../../../build.properties');
 
         $this->versionOutput = sprintf('PDepend %s%s%s', $data['project.version'] ?? '', PHP_EOL, PHP_EOL);
         $this->usageOutput = 'Usage: pdepend [options] [logger] <dir[,dir[,...]]>' . PHP_EOL . PHP_EOL;

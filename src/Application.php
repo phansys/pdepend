@@ -160,7 +160,7 @@ class Application
         $container->prependExtensionConfig('pdepend', []);
         $container->addCompilerPass(new DependencyInjection\Compiler\ProcessListenerPass());
 
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../../../resources'));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../resources'));
 
         foreach ($extensions as $extension) {
             $container->registerExtension($extension);
