@@ -408,9 +408,9 @@ return $config
             ->exclude('vendor')
             ->in([
                 __DIR__ . '/scripts',
-                __DIR__ . '/src/bin',
-                __DIR__ . '/src/main/php/PDepend',
-                __DIR__ . '/src/site',
-                __DIR__ . '/src/test/php',
+                __DIR__ . '/bin',
+                __DIR__ . '/src',
+                __DIR__ . '/site',
+                __DIR__ . '/tests/php',
             ])
     );

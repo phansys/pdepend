@@ -31,11 +31,11 @@
     },
     "autoload": {
         "psr-4": {
-            "PDepend\\": "src/main/php/PDepend"
+            "PDepend\\": "src"
         }
     },
     "bin": [
-        "src/bin/pdepend"
+        "bin/pdepend"
     ],
     "config": {
         "process-timeout": 900,
@@ -52,16 +52,16 @@
         ],
         "analyze": "@analyse",
         "build-website": [
-            "php src/site/release-news-generator.php",
-            "easy-doc build src/site/config.php --verbose"
+            "php site/release-news-generator.php",
+            "easy-doc build site/config.php --verbose"
         ],
         "check": [
             "@cs-fix",
             "@test-coverage",
             "@analyse"
         ],
-        "cs-check": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 ./src/main/php ./src/test/php",
-        "cs-fix": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 ./src/main/php ./src/test/php",
+        "cs-check": "phpcs -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 ./src ./tests/php",
+        "cs-fix": "phpcbf -p --standard=PSR2 --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1 ./src ./tests/php",
         "phpstan": "vendor/bin/phpstan",
         "test": "paratest --no-coverage",
         "test-coverage": "paratest"

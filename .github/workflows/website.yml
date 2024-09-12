@@ -44,7 +44,7 @@ jobs:
 
       - name: Build website
         run: |
-          cp -r src/site/rst/schema src/site/resources/web/
+          cp -r site/rst/schema site/resources/web/
           composer build-website
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

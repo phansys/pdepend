@@ -91,7 +91,7 @@ class PdependExtension extends SymfonyExtension
         $configuration = new Configuration($extensionManager->getActivatedExtensions());
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../../../resources'));
+        $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__ . '/../../resources'));
         $loader->load('services.xml');
 
         foreach ($extensionManager->getActivatedExtensions() as $extension) {

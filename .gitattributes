@@ -1,8 +1,8 @@
 /scripts export-ignore
 /setup export-ignore
-/src/conf export-ignore
-/src/test export-ignore
-/src/site export-ignore
+/conf export-ignore
+/tests export-ignore
+/site export-ignore
 .gitattributes export-ignore
 .github export-ignore
 .gitignore export-ignore

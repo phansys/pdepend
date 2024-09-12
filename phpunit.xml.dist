@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="src/test/php/PDepend/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/php/PDepend/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd">
   <coverage includeUncoveredFiles="true" cacheDirectory=".phpunit.cache">
     <report>
       <clover outputFile="clover.xml"/>
@@ -10,19 +10,19 @@
   </php>
   <testsuites>
     <testsuite name="PHP Depends Test Suite">
-      <directory suffix="Test.php">src/test/php</directory>
-      <directory suffix=".phpt">src/test/php</directory>
+      <directory suffix="Test.php">tests/php</directory>
+      <directory suffix=".phpt">tests/php</directory>
     </testsuite>
   </testsuites>
   <logging/>
   <source>
     <include>
-      <directory suffix=".php">src/main/php/</directory>
+      <directory suffix=".php">src/</directory>
     </include>
     <exclude>
       <directory suffix=".php">vendor/</directory>
-      <directory suffix=".php">src/test</directory>
-      <file>src/main/php/PDepend/DbusUI/ResultPrinter.php</file>
+      <directory suffix=".php">tests</directory>
+      <file>src/DbusUI/ResultPrinter.php</file>
     </exclude>
   </source>
 </phpunit>

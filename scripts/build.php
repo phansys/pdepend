@@ -8,13 +8,13 @@ $version = parse_ini_file($root . 'build.properties')['project.version'] ?? '@pa
 echo 'PDepend ', $version, PHP_EOL, PHP_EOL;
 
 $phar = new Phar($archiveName);
-$phar->buildFromDirectory($root, '/^' . preg_quote($root, '/') . 'src\/main/');
+$phar->buildFromDirectory($root, '/^' . preg_quote($root, '/') . 'src/');
 $phar->buildFromDirectory($root, '/^' . preg_quote($root, '/') . 'vendor(?!.*\/symfony\/.*\/Test\/).*$/');
 
 $patchList = [
-    'src/main/php/PDepend/TextUI/Command.php',
-    'src/main/php/PDepend/Report/Summary/Xml.php',
-    'src/main/php/PDepend/Report/Dependencies/Xml.php',
+    'src/TextUI/Command.php',
+    'src/Report/Summary/Xml.php',
+    'src/Report/Dependencies/Xml.php',
 ];
 foreach ($patchList as $filePath) {
     $content = file_get_contents($root . $filePath);
@@ -26,7 +26,7 @@ foreach ($patchList as $filePath) {
 }
 
 // Set a custom stub
-$customStubContent = file_get_contents($root . 'src/conf/phar_bootstrap.stub');
+$customStubContent = file_get_contents($root . 'conf/phar_bootstrap.stub');
 if (!$customStubContent) {
     throw new Exception('Unable to load bootstrap stub');
 }
