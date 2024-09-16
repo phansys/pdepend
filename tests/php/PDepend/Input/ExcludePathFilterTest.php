@@ -46,6 +46,8 @@ namespace PDepend\Input;
 use PDepend\AbstractTestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use ReflectionException;
+use ReflectionProperty;
 use SplFileInfo;
 
 /**
@@ -66,79 +68,71 @@ class ExcludePathFilterTest extends AbstractTestCase
      * circumstances where too many files are excluded instead of using the baseline.
      *
      * Generates 2,000 patterns of 20, 10 and 5 random alpha characters, with some slashes (about 70k characters))
-     *
-     * @return void
      */
-    public function testPatternsWithSixtyThousandCharactersAcceptsRelativeOrAbsolutePatternNotInList()
+    public function testPatternsWithSixtyThousandCharactersAcceptsRelativeOrAbsolutePatternNotInList(): void
     {
         $patterns = $this->prepareTestPatterns();
 
         $filter = new ExcludePathFilter($patterns);
-        $this->assertTrue($filter->accept('foo0/baz0/bar0', 'C:\\blahblah\\bar'));
+        static::assertTrue($filter->accept('foo0/baz0/bar0', 'C:\\blahblah\\bar'));
     }
 
     /**
      * testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList
-     *
-     * @return void
      */
-    public function testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList()
+    public function testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList(): void
     {
         $patterns = $this->prepareTestPatterns();
 
         $filter = new ExcludePathFilter($patterns);
         $firstPattern = str_replace('/', '\\', $patterns[0]);
-        $relativePath = 'foo\\'.$firstPattern;
+        $relativePath = 'foo\\' . $firstPattern;
 
-        $this->assertFalse($filter->accept($relativePath, 'C:\\blahblah\\bar'));
+        static::assertFalse($filter->accept($relativePath, 'C:\\blahblah\\bar'));
     }
 
     /**
      * testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList
-     *
-     * @return void
      */
-    public function testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList()
+    public function testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList(): void
     {
         $patterns = $this->prepareTestPatterns();
 
         $filter = new ExcludePathFilter($patterns);
         $firstPattern = str_replace('/', '\\', $patterns[0]);
-        $absolutePath = $firstPattern.'\\bar';
+        $absolutePath = $firstPattern . '\\bar';
 
-        $this->assertFalse($filter->accept('/foobar/barf00', $absolutePath));
+        static::assertFalse($filter->accept('/foobar/barf00', $absolutePath));
     }
 
     /**
      * testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue
      *
-     * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue()
+    public function testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue(): void
     {
         $patterns = $this->prepareTestPatterns();
 
         $filter = new ExcludePathFilter($patterns);
 
-        $isBulk = new \ReflectionProperty($filter, 'isBulk');
+        $isBulk = new ReflectionProperty($filter, 'isBulk');
 
-        $this->assertTrue($isBulk->getValue($filter));
+        static::assertTrue($isBulk->getValue($filter));
     }
 
     /**
      * testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse
      *
-     * @return void
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse()
+    public function testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse(): void
     {
-        $filter = new ExcludePathFilter(array('Just16Characters'));
+        $filter = new ExcludePathFilter(['Just16Characters']);
 
-        $isBulk = new \ReflectionProperty($filter, 'isBulk');
+        $isBulk = new ReflectionProperty($filter, 'isBulk');
 
-        $this->assertFalse($isBulk->getValue($filter));
+        static::assertFalse($isBulk->getValue($filter));
     }
 
     /**
@@ -159,6 +153,9 @@ class ExcludePathFilterTest extends AbstractTestCase
         static::assertTrue($filter->accept('/foo/baz/bar', '/foo/baz/bar'));
     }
 
+    /**
+     * testRelativePathMatchOrNot
+     */
     public function testRelativePathMatchOrNot(): void
     {
         $filter = new ExcludePathFilter(['link-to/bar']);
@@ -305,9 +302,10 @@ class ExcludePathFilterTest extends AbstractTestCase
     /**
      * Returns a random string with a given length.
      *
-     * @param integer $length The length of the random string.
+     * @param int $length The length of the random string.
      *
      * @return string
+     * @throws \Random\RandomException
      */
     protected function randAlpha($length = 3)
     {
@@ -315,8 +313,9 @@ class ExcludePathFilterTest extends AbstractTestCase
         $charsLength = strlen($chars);
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
-            $randomString .= $chars[mt_rand(0, $charsLength - 1)];
+            $randomString .= $chars[random_int(0, $charsLength - 1)];
         }
+
         return $randomString;
     }
 
@@ -327,9 +326,9 @@ class ExcludePathFilterTest extends AbstractTestCase
      */
     protected function prepareTestPatterns()
     {
-        $patterns = array();
+        $patterns = [];
         for ($i = 0; $i < 2000; $i++) {
-            $patterns[] = $this->randAlpha(20) . '/' . $this->randAlpha(10).'/'.$this->randAlpha(5);
+            $patterns[] = $this->randAlpha(20) . '/' . $this->randAlpha(10) . '/' . $this->randAlpha(5);
         }
 
         return $patterns;

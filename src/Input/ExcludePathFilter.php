@@ -52,6 +52,13 @@ namespace PDepend\Input;
 class ExcludePathFilter implements Filter
 {
     /**
+     * The pattern split limit before operating iteratively on patterns.
+     *
+     * @var int
+     */
+    public const PATTERN_SPLIT_LIMIT = 32766;
+
+    /**
      * Regular expression that should not match against the absolute file paths or a chunk of a relative path.
      *
      * @since 0.10.0
@@ -60,24 +67,13 @@ class ExcludePathFilter implements Filter
 
     /**
      * Indicates if we are in bulk mode.
-     *
-     * @var bool
      */
-    protected $isBulk = false;
+    protected bool $isBulk = false;
 
     /**
      * List of patterns used for bulk matching.
-     *
-     * @var array
      */
-    protected $iterativePatterns = array();
-
-    /**
-     * The pattern split limit before operating iteratively on patterns.
-     *
-     * @var int
-     */
-    const PATTERN_SPLIT_LIMIT = 32766;
+    protected array $iterativePatterns = [];
 
     /**
      * Constructs a new exclude path filter instance and accepts an array of
@@ -88,13 +84,14 @@ class ExcludePathFilter implements Filter
     public function __construct(array $patterns)
     {
         $quoted = array_map('preg_quote', $patterns);
-        $pattern = strtr(implode('|', $quoted), [
+        $patternString = strtr(implode('|', $quoted), [
             '\\*' => '.*',
             '\\\\' => '/',
         ]);
 
         if (empty($patterns) || $patternString === '') {
             $this->pattern = '/^$/';
+
             return;
         }
 
@@ -185,11 +182,8 @@ class ExcludePathFilter implements Filter
 
     /**
      * Checks if the path matches any pattern in bulk mode.
-     *
-     * @param string $path
-     * @return bool
      */
-    protected function matchesIterativePatterns($path)
+    protected function matchesIterativePatterns(string $path): bool
     {
         foreach ($this->iterativePatterns as $pattern) {
             if (!empty($pattern) && preg_match($pattern, $path)) {
