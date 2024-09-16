@@ -65,13 +65,13 @@ class ExcludePathFilter implements Filter
      */
     protected string $pattern = '';
 
-    /**
-     * Indicates if we are in bulk mode.
-     */
+    /** Indicates if we are in bulk mode. */
     protected bool $isBulk = false;
 
     /**
      * List of patterns used for bulk matching.
+     *
+     * @var array<string>
      */
     protected array $iterativePatterns = [];
 
@@ -181,7 +181,7 @@ class ExcludePathFilter implements Filter
     }
 
     /**
-     * Checks if the path matches any pattern in bulk mode.
+     * Checks if the path matches any pattern in bulk mode
      */
     protected function matchesIterativePatterns(string $path): bool
     {
