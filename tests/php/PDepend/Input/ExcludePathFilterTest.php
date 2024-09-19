@@ -136,6 +136,27 @@ class ExcludePathFilterTest extends AbstractTestCase
     }
 
     /**
+     * testEmptyPatternListSetsEmptyPattern
+     */
+    public function testEmptyPatternListSetsEmptyPatternAndIsAccepted(): void
+    {
+        $filter = new ExcludePathFilter([]);
+
+        static::assertTrue($filter->accept('any/path', 'C:\\any\\path'));
+    }
+
+    /**
+     * testEmptyPatternStringSetsEmptyPattern
+     *
+     */
+    public function testEmptyPatternStringSetsEmptyPatternAndIsAccepted(): void
+    {
+        $filter = new ExcludePathFilter(['']);
+
+        static::assertTrue($filter->accept('any/path', 'C:\\any\\path'));
+    }
+
+    /**
      * testAbsoluteUnixPathAsFilterPatternMatches
      */
     public function testAbsoluteUnixPathAsFilterPatternMatches(): void
