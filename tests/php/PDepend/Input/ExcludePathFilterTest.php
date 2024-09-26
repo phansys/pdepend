@@ -43,6 +43,7 @@
 
 namespace PDepend\Input;
 
+use Exception;
 use PDepend\AbstractTestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -147,7 +148,6 @@ class ExcludePathFilterTest extends AbstractTestCase
 
     /**
      * testEmptyPatternStringSetsEmptyPattern
-     *
      */
     public function testEmptyPatternStringSetsEmptyPatternAndIsAccepted(): void
     {
@@ -323,12 +323,9 @@ class ExcludePathFilterTest extends AbstractTestCase
     /**
      * Returns a random string with a given length.
      *
-     * @param int $length The length of the random string.
-     *
-     * @return string
-     * @throws \Random\RandomException
+     * @throws Exception
      */
-    protected function randAlpha($length = 3)
+    private function randAlpha(int $length = 3): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $charsLength = strlen($chars);
@@ -345,7 +342,7 @@ class ExcludePathFilterTest extends AbstractTestCase
      *
      * @return array<string>
      */
-    protected function prepareTestPatterns()
+    private function prepareTestPatterns(): array
     {
         $patterns = [];
         for ($i = 0; $i < 2000; $i++) {
