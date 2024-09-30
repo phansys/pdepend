@@ -95,13 +95,14 @@ class ExcludePathFilter implements Filter
             return;
         }
 
-        if (strlen($patternString) > self::PATTERN_SPLIT_LIMIT) {
-            $this->isBulk = true;
-            foreach ($quoted as $pattern) {
-                $this->iterativePatterns[] = '(^(' . $pattern . '))i';
-            }
-        } else {
+        if (strlen($patternString) <= self::PATTERN_SPLIT_LIMIT) {
             $this->pattern = '(^(' . $patternString . '))i';
+            return;
+        }
+
+        $this->isBulk = true;
+        foreach ($quoted as $pattern) {
+            $this->iterativePatterns[] = '(^(' . $pattern . '))i';
         }
     }
 
