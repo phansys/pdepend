@@ -97,6 +97,7 @@ class ExcludePathFilter implements Filter
 
         if (strlen($patternString) <= self::PATTERN_SPLIT_LIMIT) {
             $this->pattern = '(^(' . $patternString . '))i';
+
             return;
         }
 
