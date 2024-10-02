@@ -43,9 +43,12 @@
 
 namespace PDepend\Input;
 
+use Exception;
 use PDepend\AbstractTestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use ReflectionException;
+use ReflectionProperty;
 use SplFileInfo;
 
 /**
@@ -59,6 +62,100 @@ use SplFileInfo;
  */
 class ExcludePathFilterTest extends AbstractTestCase
 {
+    /**
+     * testPatternsWithSixtyThousandCharactersAcceptsRelativePatternNotInList
+     *
+     * This is to test that the default preg_match limit of 32,766 characters is avoided with large patterns in
+     * circumstances where too many files are excluded instead of using the baseline.
+     *
+     * Generates 2,000 patterns of 20, 10 and 5 random alpha characters, with some slashes (about 70k characters))
+     */
+    public function testPatternsWithSixtyThousandCharactersAcceptsRelativeOrAbsolutePatternNotInList(): void
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        static::assertTrue($filter->accept('foo0/baz0/bar0', 'C:\\blahblah\\bar'));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList
+     */
+    public function testPatternsWithSixtyThousandCharactersRejectsRelativePatternFoundInList(): void
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        $firstPattern = str_replace('/', '\\', $patterns[0]);
+        $relativePath = 'foo\\' . $firstPattern;
+
+        static::assertFalse($filter->accept($relativePath, 'C:\\blahblah\\bar'));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList
+     */
+    public function testPatternsWithSixtyThousandCharactersRejectsAbsolutePatternFoundInList(): void
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+        $firstPattern = str_replace('/', '\\', $patterns[0]);
+        $absolutePath = $firstPattern . '\\bar';
+
+        static::assertFalse($filter->accept('/foobar/barf00', $absolutePath));
+    }
+
+    /**
+     * testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue
+     *
+     * @throws ReflectionException
+     */
+    public function testPatternsWithSixtyThousandCharactersSetProtectedIsBulkToTrue(): void
+    {
+        $patterns = $this->prepareTestPatterns();
+
+        $filter = new ExcludePathFilter($patterns);
+
+        $isBulk = new ReflectionProperty($filter, 'isBulk');
+
+        static::assertTrue($isBulk->getValue($filter));
+    }
+
+    /**
+     * testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse
+     *
+     * @throws ReflectionException
+     */
+    public function testPatternsWithLessThanThirtyThousandCharactersSetProtectedIsBulkToFalse(): void
+    {
+        $filter = new ExcludePathFilter(['Just16Characters']);
+
+        $isBulk = new ReflectionProperty($filter, 'isBulk');
+
+        static::assertFalse($isBulk->getValue($filter));
+    }
+
+    /**
+     * testEmptyPatternListSetsEmptyPattern
+     */
+    public function testEmptyPatternListSetsEmptyPatternAndIsAccepted(): void
+    {
+        $filter = new ExcludePathFilter([]);
+
+        static::assertTrue($filter->accept('any/path', 'C:\\any\\path'));
+    }
+
+    /**
+     * testEmptyPatternStringSetsEmptyPattern
+     */
+    public function testEmptyPatternStringSetsEmptyPatternAndIsAccepted(): void
+    {
+        $filter = new ExcludePathFilter(['']);
+
+        static::assertTrue($filter->accept('any/path', 'C:\\any\\path'));
+    }
+
     /**
      * testAbsoluteUnixPathAsFilterPatternMatches
      */
@@ -77,6 +174,9 @@ class ExcludePathFilterTest extends AbstractTestCase
         static::assertTrue($filter->accept('/foo/baz/bar', '/foo/baz/bar'));
     }
 
+    /**
+     * testRelativePathMatchOrNot
+     */
     public function testRelativePathMatchOrNot(): void
     {
         $filter = new ExcludePathFilter(['link-to/bar']);
@@ -218,5 +318,37 @@ class ExcludePathFilterTest extends AbstractTestCase
         sort($actual);
 
         return $actual;
+    }
+
+    /**
+     * Returns a random string with a given length.
+     *
+     * @throws Exception
+     */
+    private function randAlpha(int $length = 3): string
+    {
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        $charsLength = strlen($chars);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $chars[random_int(0, $charsLength - 1)];
+        }
+
+        return $randomString;
+    }
+
+    /**
+     * Prepares a list of test patterns which loosely resemble a directory/path, e.g. abcd/efg/hijk
+     *
+     * @return array<string>
+     */
+    private function prepareTestPatterns(): array
+    {
+        $patterns = [];
+        for ($i = 0; $i < 2000; $i++) {
+            $patterns[] = $this->randAlpha(20) . '/' . $this->randAlpha(10) . '/' . $this->randAlpha(5);
+        }
+
+        return $patterns;
     }
 }

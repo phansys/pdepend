@@ -52,11 +52,28 @@ namespace PDepend\Input;
 class ExcludePathFilter implements Filter
 {
     /**
+     * The pattern split limit before operating iteratively on patterns.
+     *
+     * @var int
+     */
+    public const PATTERN_SPLIT_LIMIT = 32766;
+
+    /**
      * Regular expression that should not match against the absolute file paths or a chunk of a relative path.
      *
      * @since 0.10.0
      */
     protected string $pattern = '';
+
+    /** Indicates if we are in bulk mode. */
+    protected bool $isBulk = false;
+
+    /**
+     * List of patterns used for bulk matching.
+     *
+     * @var array<string>
+     */
+    protected array $iterativePatterns = [];
 
     /**
      * Constructs a new exclude path filter instance and accepts an array of
@@ -67,12 +84,27 @@ class ExcludePathFilter implements Filter
     public function __construct(array $patterns)
     {
         $quoted = array_map('preg_quote', $patterns);
-        $pattern = strtr(implode('|', $quoted), [
+        $patternString = strtr(implode('|', $quoted), [
             '\\*' => '.*',
             '\\\\' => '/',
         ]);
 
-        $this->pattern = '(^(' . $pattern . '))i';
+        if (empty($patterns) || $patternString === '') {
+            $this->pattern = '/^$/';
+
+            return;
+        }
+
+        if (strlen($patternString) <= self::PATTERN_SPLIT_LIMIT) {
+            $this->pattern = '(^(' . $patternString . '))i';
+
+            return;
+        }
+
+        $this->isBulk = true;
+        foreach ($quoted as $pattern) {
+            $this->iterativePatterns[] = '(^(' . $pattern . '))i';
+        }
     }
 
     /**
@@ -95,12 +127,20 @@ class ExcludePathFilter implements Filter
      */
     protected function notAbsolute(string $path): bool
     {
+        if ($this->isBulk) {
+            return !$this->matchesIterativePatterns(str_replace('\\', '/', $path));
+        }
+
+        if (empty($this->pattern)) {
+            return true;
+        }
+
         return !preg_match($this->pattern, str_replace('\\', '/', $path));
     }
 
     /**
      * This method checks if the given <b>$path</b> does not match against the
-     * exclude patterns as an relative path.
+     * exclude patterns as a relative path.
      *
      * @param string $path The relative path to a source file.
      * @since  0.10.0
@@ -118,11 +158,41 @@ class ExcludePathFilter implements Filter
 
             $subPath = substr($subPath, $slashPosition + 1);
 
+            if ($this->isBulk && $this->matchesIterativePatterns($subPath)) {
+                return false;
+            }
+
+            if (empty($this->pattern)) {
+                continue;
+            }
+
             if (preg_match($this->pattern, $subPath) || preg_match($this->pattern, "/$subPath")) {
                 return false;
             }
         }
 
+        if ($this->isBulk) {
+            return !$this->matchesIterativePatterns($subPath);
+        }
+
+        if (empty($this->pattern)) {
+            return true;
+        }
+
         return !preg_match($this->pattern, $subPath);
+    }
+
+    /**
+     * Checks if the path matches any pattern in bulk mode
+     */
+    protected function matchesIterativePatterns(string $path): bool
+    {
+        foreach ($this->iterativePatterns as $pattern) {
+            if (!empty($pattern) && preg_match($pattern, $path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
